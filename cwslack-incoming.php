@@ -37,6 +37,8 @@ if($_REQUEST['action'] == "updated" && $_REQUEST['srDetailRecId']==0 && $_REQUES
 
 if($_REQUEST['isProblemDescription']=="False" && $_REQUEST['isInternalAnalysis']=="False" && $_REQUEST['isResolution']=="False") die; //Die if no actual update.
 
+error_log("Evaluating Request: " . print_r($_REQUEST,true));
+
 $badboards = explode("|",$badboard); //Explode with pipe seperator.
 $badstatuses = explode("|",$badstatus); //Explode with pipe seperator.
 $badcompanies = explode("|",$badcompany); //Explode with pipe seperator.
@@ -152,6 +154,8 @@ if($posttext==1) //Block for curl to get latest note
 
 	}
 }
+//error_log(print_r("just before posting, value of channel",true));
+//error_log(print_r($channel,true));
 
 if($_REQUEST['action'] == "added" && $postadded == 1)
 {
@@ -388,6 +392,9 @@ if($followenabled==1)
 			}
 
 			cURLPost($webhookurl, $header_data2, "POST", $postfieldspre);
+			error_log(print_r("Array sent to slack User",true));
+			error_log(print_r($postfieldspre,true));
+			error_log(print_r($Username,true));
 		}
 	}
 }

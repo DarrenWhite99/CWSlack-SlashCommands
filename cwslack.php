@@ -237,6 +237,11 @@ if (strpos(strtolower($exploded[0]), "new") !== false)
 //-
 //Ticket data section
 //-
+if($debugmode) //If the global $debugmode variable is set to true
+{
+	print("Ticket info from URL: ".$urlticketdata. "\n");
+}
+
 $dataTData = cURL($urlticketdata, $header_data); //Decode the JSON returned by the CW API.
 
 if($dataTData==NULL)
@@ -389,12 +394,16 @@ if($command=="scheduleme")
 			$row = mysqli_fetch_assoc($result); //Row association.
 
 			$cwuser = $row["cwname"]; //Return the connectwise name of the row found as the CW member name.
+			error_log(print_r("User found in Database",true));
+			error_log(print_r($cwuser,true));
 		}
 		else //If no rows are found
 		{
 			if($usecwname==1) //If variable enabled
 			{
+				error_log(print_r("User not found in Database",true));
 				$cwuser = $_REQUEST['user_name'];
+				error_log(print_r($cwuser,true));
 			}
 		}
 	}
@@ -1027,9 +1036,13 @@ else //If no command is set, or if it's just random gibberish after ticket numbe
 
 if ($timeoutfix == true) {
 	cURLPost($_REQUEST["response_url"], array("Content-Type: application/json"), "POST", $return);
+	error_log(print_r("Array sent to slack from cwslack",true));
+	error_log(print_r($return,true));
 } else {
 	die(json_encode($return, JSON_PRETTY_PRINT)); //Return properly encoded arrays in JSON for Slack parsing.
 }
+error_log(print_r("Array sent to slack from cwslack",true));
+error_log(print_r($return,true));
 die();
 
 ?>

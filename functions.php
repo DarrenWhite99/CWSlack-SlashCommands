@@ -31,6 +31,7 @@ $globalVersion = "2019.3";
 function cURL($url, $header)
 {
     global $debugmode; //Require global variable $debugmode from config.php.
+	error_log("Retrieving: " . $url);
     $ch = curl_init(); //Initiate a curl session
 
     //Create curl array to set the API url, headers, and necessary flags.
@@ -56,9 +57,12 @@ function cURL($url, $header)
     }
     curl_close($ch); //Close the curl connection for cleanup.
 
+    error_log("Curl Return: " . print_r($curlBodyTData,true)); //Output from connectwise.
     $jsonDecode = json_decode($curlBodyTData); //Decode the JSON returned by the CW API.
+//    error_log("JSON Data: " . print_r($jsonDecode,true)); //JSON Parsing from connectwise.
 
     if(is_array($jsonDecode) && array_key_exists("code",$jsonDecode)) { //Check if array contains error code
+        error_log("Returned Data has an error code: " . print_r($jsonDecode->code,true)); 
         if($jsonDecode->code == "NotFound") { //If error code is NotFound
             die("Connectwise record was not found."); //Report that the ticket was not found.
         }
@@ -66,6 +70,7 @@ function cURL($url, $header)
             die("401 Unauthorized, check API key to ensure it is valid."); //Fail case.
         }
         else { //Else other error
+            error_log("Returned Error Message: " . print_r($jsonDecode->message,true)); 
             die("Unknown Error Occurred, check API key and other API settings. Error " . $jsonDecode->code . ": " . $jsonDecode->message); //Fail case, including the message and code output from connectwise.
         }
     }
@@ -73,6 +78,7 @@ function cURL($url, $header)
     {
         $errors = $jsonDecode->errors; //Make array easier to access.
 
+        error_log("Returned Data has errors: " . print_r($errors[0]->message,true)); 
         die("ConnectWise Error: " . $errors[0]->message); //Return CW error
     }
 
@@ -90,8 +96,10 @@ function cURLPost($url, $header, $request, $postfieldspre)
     global $debugmode; //Require global variable $debugmode from config.php
     $ch = curl_init(); //Initiate a curl session
 
+//	error_log("Posting to: " . $url);
     $postfields = json_encode($postfieldspre); //Format the array as JSON
 
+//    error_log("Post Data: " . print_r($postfields,true)); //JSON Post Body
     //Same as previous curl array but includes required information for PATCH commands.
     $curlOpts = array(
         CURLOPT_URL => $url,
@@ -124,8 +132,10 @@ function cURLPost($url, $header, $request, $postfieldspre)
         return null;
     }
     $jsonDecode = json_decode($curlBodyTCmd); //Decode the JSON returned by the CW API.
+//    error_log("JSON Data: " . print_r($jsonDecode,true)); //JSON Parsing from connectwise.
 
     if(is_array($jsonDecode) && array_key_exists("code",$jsonDecode)) { //Check if array contains error code
+        error_log("Returned Data has an error code: " . print_r($jsonDecode->code,true)); 
         if($jsonDecode->code == "NotFound") { //If error code is NotFound
             die("Connectwise record was not found."); //Report that the ticket was not found.
         }
@@ -136,18 +146,23 @@ function cURLPost($url, $header, $request, $postfieldspre)
         {
             die("Error: " . $jsonDecode->errors->message . " - Please check to ensure you have this user mapped in the database using /dbm, as their name most likely differs between Slack and ConnectWise");
         }
+        else if (array_key_exists("message",$jsonDecode)) { //Check if array contains error message
+            error_log("Returned Error Message: " . print_r($jsonDecode->message,true)); 
+            die("Unknown Error Occurred, check API key and other API settings. Error " . $jsonDecode->code . ": " . $jsonDecode->message); //Fail case, including the message and code output from connectwise.
+        }
         else if($jsonDecode->code == NULL)
         {
             //do nothing.
         }
-        else {
-            die("Unknown Error Occurred, check API key and other API settings. Error " . $jsonDecode->code . ": " . $jsonDecode->message); //Fail case.
+        else { //Else other error
+            die("Unknown Error Occurred. Error code " . $jsonDecode->code); //Fail case, include the error code.
         }
     }
     if(is_array($jsonDecode) && array_key_exists("errors",$jsonDecode)) //If connectwise returned an error.
     {
         $errors = $jsonDecode->errors; //Make array easier to access.
 
+        error_log("Returned Data has errors: " . print_r($errors[0]->message,true)); 
         die("ConnectWise Error: " . $errors[0]->message); //Return CW error
     }
 
