@@ -34,7 +34,7 @@ $exploded = explode(" ",$_REQUEST['text']); //Explode the string attached to the
 //This section checks if the ticket number is not equal to 6 digits (our tickets are in the hundreds of thousands but not near a million yet) and kills the connection if it's not.
 if(!is_numeric($exploded[0])) {
 	//Check to see if the first command in the text array is actually help, if so redirect to help webpage detailing slash command use.
-	if ($exploded[0]=="help") {
+	if ($exploded[0]=="help" || $exploded[0]=="?") {
 		die(json_encode(array("parse" => "full", "response_type" => "in_channel","text" => "Please visit " . $helpurl . " for more help information","mrkdwn"=>true)));
 	}
 	if ($exploded[0]=="new")
@@ -123,7 +123,7 @@ if (strpos(strtolower($exploded[0]), "new") !== false)
 			die();
 		}
 
-		$boardurl = $connectwise . "/$connectwisebranch/apis/3.0/service/boards?conditions=name%20contains%20%27" .$ticketstuff[0]. "%27";
+		$boardurl = $connectwise . "/$connectwisebranch/apis/3.0/service/boards?conditions=name%20contains%20%27" . urlencode($ticketstuff[0]). "%27";
 		$boarddata = cURL($boardurl, $header_data);
 
 		$postarray = array(
@@ -1008,7 +1008,7 @@ else //If no command is set, or if it's just random gibberish after ticket numbe
 			"response_type" => "in_channel",
 			"attachments"=>array(array(
 				"fallback" => "Info on Ticket #" . $dataTData->id, //Fallback for notifications
-				"title" => "<" . $ticketurl . $dataTData -> id . "&companyName=" . $companyname . "|#" . $dataTData->id . ">: " . $dataTData->summary, //Return clickable link to ticket with ticket summary.
+				"title" => "<" . $ticketurl . $dataTData->id . "&companyName=" . $companyname . "|#" . $dataTData->id . ">: " . $dataTData->summary, //Return clickable link to ticket with ticket summary.
 				"pretext" => "Info on Ticket #" . $dataTData->id, //Return info string with ticket number.
 				"text" =>  $dataTData->company->identifier . " / " . $contact . //Return "Company / Contact" string
 				"\n" . $dateformat . " | " . $dataTData->status->name . //Return "Date Entered / Status" string
