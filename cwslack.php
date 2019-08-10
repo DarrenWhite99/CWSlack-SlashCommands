@@ -224,11 +224,12 @@ if (strpos(strtolower($exploded[0]), "new") !== false)
 
 	if($timeoutfix == true)
 	{
-		cURLPost($_REQUEST["response_url"],array("Content-Type: application/json"),"POST",array("parse" => "full", "response_type" => "ephemeral","text" => "New ticket #<" . $connectwise . "/$connectwisebranch/services/system_io/Service/fv_sr100_request.rails?service_recid=" . $dataTCmd->id . "|" . $dataTCmd->id . "> has been created.","mrkdwn"=>true));
+		cURLPost($_REQUEST["response_url"],array("Content-Type: application/json"),"POST",array("parse" => "full", "response_type" => "ephemeral","text" => "New ticket " . $dataTCmd->id . " has been created.",
+		"blocks" => array(array("type" => "section","text" => array("type" => "mrkdwn","text" => "New ticket <" .$connectwise . "/" . $connectwisebranch . "/services/system_io/Service/fv_sr100_request.rails?service_recid=" . $dataTCmd->id . "|#" . $dataTCmd->id . "> has been created.")))));
 	}
 	else
 	{
-		die("New ticket #<" . $connectwise . "/$connectwisebranch/services/system_io/Service/fv_sr100_request.rails?service_recid=" . $dataTCmd->id . "|" . $dataTCmd->id . "> has been created.");
+		die("New ticket <" . $connectwise . "/$connectwisebranch/services/system_io/Service/fv_sr100_request.rails?service_recid=" . $dataTCmd->id . "|#" . $dataTCmd->id . "> has been created.");
 	}
 	die();
 }
