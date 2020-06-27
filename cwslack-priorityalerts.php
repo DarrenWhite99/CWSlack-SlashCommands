@@ -139,7 +139,11 @@ foreach($dataTData as $entry)
             ))
         );
 
-        cURLPost($webhookurl, $header_data2, "POST", $postfieldspre);
+        cURLPost($webhookurlpriority, $header_data2, "POST", $postfieldspre);
+		error_log(print_r("Array sent to slack channel for priorityalerts",true));
+		error_log(print_r($postfieldspre,true));
+		error_log(print_r($channel,true));
+		error_log(print_r($webhookurlpriority,true));
     }
     if($posttochan==1) //If channel post is on
     {
@@ -176,6 +180,10 @@ foreach($dataTData as $entry)
             );
         }
 
-        cURLPost($webhookurl, $header_data2, "POST", $postfieldspre);
+        cURLPost($webhookurlpriority, $header_data2, "POST", $postfieldspre);
+		error_log(print_r("Array sent to slack channel",true));
+		error_log(print_r($postfieldspre,true));
+		error_log(print_r($channel,true));
+		error_log(print_r($webhookurlpriority,true));
     }
 }

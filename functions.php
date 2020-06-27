@@ -43,7 +43,10 @@ function cURL($url, $header)
         CURLOPT_HEADER => 1, //Use header
     );
     curl_setopt_array($ch, $curlOpts); //Set the curl array to $curlOpts
-
+	curl_setopt ($ch, CURLOPT_CAINFO, 'c:/cert/cacert.pem');
+	curl_setopt ($ch, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0); 
+    
     $answerTData = curl_exec($ch); //Set $answerTData to the curl response to the API.
     $headerLen = curl_getinfo($ch, CURLINFO_HEADER_SIZE);  //Get the header length of the curl response
     $curlBodyTData = substr($answerTData, $headerLen); //Remove header data from the curl string.
@@ -69,9 +72,12 @@ function cURL($url, $header)
         if($jsonDecode->code == "Unauthorized") { //If error code is an authorization error
             die("401 Unauthorized, check API key to ensure it is valid."); //Fail case.
         }
-        else { //Else other error
+        if (array_key_exists("message",$jsonDecode)) { //Check if array contains error message
             error_log("Returned Error Message: " . print_r($jsonDecode->message,true)); 
             die("Unknown Error Occurred, check API key and other API settings. Error " . $jsonDecode->code . ": " . $jsonDecode->message); //Fail case, including the message and code output from connectwise.
+        }
+        else { //Else other error
+            die("Unknown Error Occurred. Error code " . $jsonDecode->code); //Fail case, include the error code.
         }
     }
     if(is_array($jsonDecode) && array_key_exists("errors",$jsonDecode)) //If connectwise returned an error.
@@ -112,6 +118,9 @@ function cURLPost($url, $header, $request, $postfieldspre)
         CURLOPT_HEADER => 1,
     );
     curl_setopt_array($ch, $curlOpts);
+	curl_setopt ($ch, CURLOPT_CAINFO, 'c:/cert/cacert.pem');
+	curl_setopt ($ch, CURLOPT_SSL_VERIFYHOST, 0);
+	curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0); 
 
     $answerTCmd = curl_exec($ch);
     $headerLen = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
